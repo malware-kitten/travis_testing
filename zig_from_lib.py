@@ -111,6 +111,7 @@ def process_single_file(fname, oname, num_threads):
         target_path = tempfile.mkdtemp(dir=".")
         command = ['7z', 'x', '-o'+target_path, fname]
         logger.debug("Building tmp location at %s" % target_path)
+        logger.debug(command)
         output = subprocess.check_output(command)
         logger.debug(output)
         queue = multiprocessing.Queue()
