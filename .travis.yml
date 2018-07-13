@@ -19,7 +19,7 @@ before_script:
 - pip install r2pipe
 - pip install pathlib
 - pip install simplejson 
-- wget "https://github.com/dotnetinstaller/dotnetinstaller/blob/master/ThirdParty/Microsoft/Windows%20SDK%20v6.0/VC/LIB/msvcrt.lib?raw=true" -O msvcrt.lib
+- wget "https://github.com/dotnetinstaller/dotnetinstaller/blob/master/ThirdParty/Microsoft/Visual%20Studio%208/VC/lib/vcomp.lib?raw=true" -O vcomp.lib
 addons:
   apt:
     update: true
@@ -27,8 +27,7 @@ addons:
         - p7zip-full
 
 script:
-- python zig_from_lib.py -f msvcrt.lib -o msvcrt.zig -vvv
-install: travis_wait 30 mvn install
+- python zig_from_lib.py -f vcomp.lib -o vcomp.zig -vvv
 
 deploy:
   skip_cleanup: true
