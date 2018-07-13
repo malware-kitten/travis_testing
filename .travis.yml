@@ -19,7 +19,7 @@ before_script:
 - pip install r2pipe
 - pip install pathlib
 - pip install simplejson 
-- wget "https://github.com/dotnetinstaller/dotnetinstaller/blob/master/ThirdParty/Microsoft/Visual%20Studio%208/VC/lib/vcomp.lib?raw=true" -O vcomp.lib
+- wget "https://github.com/dotnetinstaller/dotnetinstaller/blob/master/ThirdParty/Microsoft/Visual%20Studio%208/VC/lib/opends60.lib?raw=true" -O opends60.lib
 addons:
   apt:
     update: true
@@ -27,7 +27,8 @@ addons:
         - p7zip-full
 
 script:
-- python zig_from_lib.py -f vcomp.lib -o vcomp.zig -vvv
+- python zig_from_lib.py -f opends60.lib -o opends60.lib.zig -vvv
+- echo "Complete!"
 
 deploy:
   skip_cleanup: true
