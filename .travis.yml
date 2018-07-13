@@ -2,8 +2,9 @@ os:
 - linux
 sudo:
 - false
-language:
-- python
+language: python
+python:
+  - "3.5"
 before_script:
 - git clone https://github.com/radare/radare2 && cd radare2
 - "./configure --prefix=`pwd`/install > /dev/null"
@@ -16,6 +17,7 @@ before_script:
 - export PKG_CONFIG_PATH=${TRAVIS_BUILD_DIR}/radare2/pkgcfg
 - cd ..
 - pip install r2pipe
+- pip install pathlib
 - pip install simplejson 
 - wget "https://github.com/dotnetinstaller/dotnetinstaller/blob/master/ThirdParty/Microsoft/Windows%20SDK%20v6.0/VC/LIB/msvcrt.lib?raw=true"
 script:
