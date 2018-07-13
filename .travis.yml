@@ -27,7 +27,7 @@ addons:
         - p7zip-full
 
 script:
-- python zig_from_lib.py -f opends60.lib -o opends60.lib.zig -vvv
+- python zig_from_lib.py -f opends60.lib -o opends60.lib.zig -vvv 2>&1
 - echo "Complete!"
 
 deploy:
