@@ -97,6 +97,7 @@ def dedup(zignatures):
 def worker(queue, shared_results, lock):
     while not queue.empty():
         obj = queue.get(True)
+        print(" - %s" % obj)
         json_items = generate_zigs_json(obj)
         with lock:
             for zigs in json_items:
