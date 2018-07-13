@@ -20,6 +20,12 @@ before_script:
 - pip install pathlib
 - pip install simplejson 
 - wget "https://github.com/dotnetinstaller/dotnetinstaller/blob/master/ThirdParty/Microsoft/Windows%20SDK%20v6.0/VC/LIB/msvcrt.lib?raw=true" -O msvcrt.lib
+addons:
+  apt:
+    update: true
+    packages:
+        - p7zip-full
+
 script:
 - python zig_from_lib.py -f msvcrt.lib -o msvcrt.zig
 deploy:
