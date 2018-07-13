@@ -1,0 +1,27 @@
+os:
+- linux
+sudo:
+- false
+language:
+- python
+before_script:
+- git clone https://github.com/radare/radare2 && cd radare2
+- "./configure --prefix=`pwd`/install > /dev/null"
+- make -s -j2 > /dev/null
+- make install > /dev/null
+- export PATH=${TRAVIS_BUILD_DIR}/radare2/install/bin:${PATH}
+- export LD_LIBRARY_PATH=${TRAVIS_BUILD_DIR}/radare2/install/lib:${LD_LIBRARY_PATH}
+- export LIBR_INCLUDE=${TRAVIS_BUILD_DIR}/radare2/libr/include
+- export LIBR_UTIL=${TRAVIS_BUILD_DIR}/radare2/libr/util
+- export PKG_CONFIG_PATH=${TRAVIS_BUILD_DIR}/radare2/pkgcfg
+- cd ..
+- pip install r2pipe
+- pip install simplejson 
+- wget "https://github.com/dotnetinstaller/dotnetinstaller/blob/master/ThirdParty/Microsoft/Windows%20SDK%20v6.0/VC/LIB/msvcrt.lib?raw=true"
+script:
+- python zig_from_lib.py -f msvcrt.lib -o msvcrt.zig
+deploy:
+  skip_cleanup: true
+  provider: releases
+  file: msvcrt.lib
+repo: securitykitten/travis_testing
