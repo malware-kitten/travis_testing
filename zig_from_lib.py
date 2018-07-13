@@ -122,7 +122,7 @@ def process_single_file(fname, oname, num_threads):
         pool.close()
         pool.join()
     else:
-        print("File magic does not match, check to make sure this is a .lib file")
+        logger.error("File magic does not match, check to make sure this is a .lib file")
         return
     #cleanup
     shutil.rmtree(target_path)
@@ -142,6 +142,12 @@ def process_directory(target_path, target_directory, num_threads):
         else:
             process_single_file(fname, oname, num_threads)
 
+def configure_logger(log_level):
+    log_levels = {0: logging.ERROR, 1: logging.WARNING, 2: logging.INFO, 3: logging.DEBUG}
+    log_level = min(max(log_level, 0), 3) #clamp to 0-3 inclusive
+    logging.basicConfig(level=log_levels[log_level], 
+            format='%(asctime)s - %(name)s - %(levelname)-8s %(message)s')
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Generate R2 Zignatures from .lib files')
     group_toplevel = parser.add_mutually_exclusive_group(required=True)
@@ -150,12 +156,12 @@ if __name__ == '__main__':
     parser.add_argument("-o", "--output",required=True,help="output filename or directory")
     parser.add_argument("-s", "--sdb", action='store_true', help="store as sdb files")
     parser.add_argument("-t", "--threads", default=8, type=int, help="number of threads, default 8")
+    parser.add_argument('-v', '--verbose', action='count', default=0, 
+        help='Increase verbosity. Can specify multiple times for more verbose output')
     args = parser.parse_args()
-    logger = logging.getLogger(__name__)
-    handler.setLevel(logging.INFO)
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
+    
+    configure_logger(args.verbose)
+    logger = logging.getLogger("MS_Zig_Parser")
 
     if args.file:
         process_single_file(args.file, args.output, args.threads)
