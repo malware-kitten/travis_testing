@@ -27,7 +27,7 @@ addons:
         - p7zip-full
 
 script:
-- python zig_from_lib.py -f msvcrt.lib -o msvcrt.zig -vvv
+- travis_wait 20 python zig_from_lib.py -f msvcrt.lib -o msvcrt.zig -vvv
 deploy:
   skip_cleanup: true
   provider: releases
