@@ -89,7 +89,7 @@ def dedup(zignatures):
     uniq_results = []
     for zig in zignatures:
         if zig['bytes'] in observed:
-            logger.info("Removing %s" % zig)
+            logger.debug("Removing %s" % zig)
         else:
             observed[zig['bytes']] = 1
             uniq_results.append(zig)
@@ -98,7 +98,7 @@ def dedup(zignatures):
 def worker(queue, shared_results, lock):
     while not queue.empty():
         obj = queue.get(True)
-        logger.info(" - %s" % obj)
+        logger.debug(" - %s" % obj)
         json_items = generate_zigs_json(obj)
         with lock:
             for zigs in json_items:
