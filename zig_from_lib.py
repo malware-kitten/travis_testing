@@ -7,6 +7,7 @@ import tempfile
 import os
 import simplejson as json
 import shutil
+import logging
 from pprint import pprint, pformat
 from pathlib import Path
 
@@ -88,7 +89,7 @@ def dedup(zignatures):
     uniq_results = []
     for zig in zignatures:
         if zig['bytes'] in observed:
-            print("Removing %s" % zig)
+            logger.info("Removing %s" % zig)
         else:
             observed[zig['bytes']] = 1
             uniq_results.append(zig)
@@ -97,7 +98,7 @@ def dedup(zignatures):
 def worker(queue, shared_results, lock):
     while not queue.empty():
         obj = queue.get(True)
-        print(" - %s" % obj)
+        logger.info(" - %s" % obj)
         json_items = generate_zigs_json(obj)
         with lock:
             for zigs in json_items:
@@ -116,6 +117,7 @@ def process_single_file(fname, oname, num_threads):
         shared_results = manager.list()
         for f in recursive_all_files(target_path, 'obj'):
             queue.put(f)
+        logger.info("%s : %s" % (fname, queue.qsize()))
         pool = multiprocessing.Pool(num_threads, worker, (queue, shared_results, lock))
         pool.close()
         pool.join()
@@ -135,7 +137,6 @@ def process_directory(target_path, target_directory, num_threads):
     for fname in recursive_all_files(target_path, 'lib'):
         output_name = normalize_name(fname)
         oname = str(Path(target_directory) / output_name)
-        print("- %s" % fname)
         if oname in processed:
             continue
         else:
@@ -150,6 +151,11 @@ if __name__ == '__main__':
     parser.add_argument("-s", "--sdb", action='store_true', help="store as sdb files")
     parser.add_argument("-t", "--threads", default=8, type=int, help="number of threads, default 8")
     args = parser.parse_args()
+    logger = logging.getLogger(__name__)
+    handler.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
 
     if args.file:
         process_single_file(args.file, args.output, args.threads)
