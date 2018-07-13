@@ -112,6 +112,7 @@ def process_single_file(fname, oname, num_threads):
         command = ['7z', 'x', '-o'+target_path, fname]
         logger.debug("Building tmp location at %s" % target_path)
         output = subprocess.check_output(command)
+        logger.debug(output)
         queue = multiprocessing.Queue()
         lock = multiprocessing.Lock()
         manager = multiprocessing.Manager()
