@@ -26,5 +26,5 @@ addons:
         - p7zip-full
 
 script:
-- wget "https://github.com/dotnetinstaller/dotnetinstaller/blob/master/ThirdParty/Microsoft/Visual%20Studio%208/VC/lib/opends60.lib?raw=true" -O opends60.lib
-- python zig_from_lib.py -f opends60.lib -o opends60.lib.zig -vvv 2>&1
+- wget "https://github.com/dotnetinstaller/dotnetinstaller/blob/master/ThirdParty/Microsoft/Visual%20Studio%208/VC/lib/msvcrt.lib?raw=true" -O ./msvcrt.lib
+- python zig_from_lib.py -f ./msvcrt.lib -o ./msvcrt.zig -vvv 2>&1
