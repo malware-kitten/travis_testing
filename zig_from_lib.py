@@ -109,7 +109,7 @@ def process_single_file(fname, oname, num_threads):
         contents = fp.read(7)
     if contents == b'!<arch>':
         target_path = tempfile.mkdtemp()
-        command = ['7z', 'x', '-y', '-o'+target_path, fname]
+        command = ['7z', 'x', '-y', '-o'+target_path, fname, "*.obj", '-r']
         logger.debug("Building tmp location at %s" % target_path)
         logger.debug(command)
         output = subprocess.call(command)
