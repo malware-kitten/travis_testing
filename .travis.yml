@@ -19,8 +19,6 @@ before_script:
 - pip install r2pipe
 - pip install pathlib
 - pip install simplejson 
-- wget "https://github.com/dotnetinstaller/dotnetinstaller/blob/master/ThirdParty/Microsoft/Visual%20Studio%208/VC/lib/opends60.lib?raw=true" -O opends60.lib
-- ls
 addons:
   apt:
     update: true
@@ -28,11 +26,5 @@ addons:
         - p7zip-full
 
 script:
+- wget "https://github.com/dotnetinstaller/dotnetinstaller/blob/master/ThirdParty/Microsoft/Visual%20Studio%208/VC/lib/opends60.lib?raw=true" -O opends60.lib
 - python zig_from_lib.py -f opends60.lib -o opends60.lib.zig -vvv 2>&1
-- echo "Complete!"
-
-deploy:
-  skip_cleanup: true
-  provider: releases
-  file: msvcrt.lib
-repo: securitykitten/travis_testing
