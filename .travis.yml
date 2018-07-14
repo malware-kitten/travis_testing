@@ -20,6 +20,7 @@ before_script:
 - pip install pathlib
 - pip install simplejson 
 - wget "https://github.com/dotnetinstaller/dotnetinstaller/blob/master/ThirdParty/Microsoft/Visual%20Studio%208/VC/lib/opends60.lib?raw=true" -O opends60.lib
+- ls
 addons:
   apt:
     update: true
