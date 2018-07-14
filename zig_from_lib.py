@@ -108,11 +108,11 @@ def process_single_file(fname, oname, num_threads):
     with open(fname,'rb') as fp:
         contents = fp.read(7)
     if contents == b'!<arch>':
-        target_path = tempfile.mkdtemp(dir=".")
+        target_path = tempfile.mkdtemp()
         command = ['7z', 'x', '-o'+target_path, fname]
         logger.debug("Building tmp location at %s" % target_path)
+        output = subprocess.check_output(command, shell=False)
         logger.debug(command)
-        output = subprocess.check_output(command,stderr=subprocess.STDOUT, shell=True)
         logger.debug(output)
         queue = multiprocessing.Queue()
         lock = multiprocessing.Lock()
