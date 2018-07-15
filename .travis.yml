@@ -1,11 +1,11 @@
 os:
 - linux
-sudo:
-- false
 language: python
 python:
   - "3.5"
 before_script:
+- wget "http://ftp.us.debian.org/debian/pool/main/p/p7zip/p7zip-full_16.02+dfsg-6_amd64.deb" -O 7z.deb
+- sudo dpkg -i 7z.deb
 - git clone https://github.com/radare/radare2 && cd radare2
 - "./configure --prefix=`pwd`/install > /dev/null"
 - make -s -j2 > /dev/null
@@ -19,11 +19,6 @@ before_script:
 - pip install r2pipe
 - pip install pathlib
 - pip install simplejson 
-addons:
-  apt:
-    update: true
-    packages:
-        - p7zip-full
 
 script:
 - wget "https://github.com/dotnetinstaller/dotnetinstaller/blob/master/ThirdParty/Microsoft/Visual%20Studio%208/VC/lib/msvcrt.lib?raw=true" -O ./msvcrt.lib
