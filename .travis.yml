@@ -5,9 +5,10 @@ sudo: required
 python:
   - "3.5"
 before_script:
-- wget "https://sourceforge.net/projects/p7zip/files/p7zip/16.02/p7zip_16.02_x86_linux_bin.tar.bz2/download?use_mirror=iweb&r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fp7zip%2Ffiles%2Fp7zip%2F16.02%2F&use_mirror=iweb" -O p7zip.tar.bz2
+- wget "https://sourceforge.net/projects/p7zip/files/p7zip/16.02/p7zip_16.02_src_all.tar.bz2/download" -O p7zip.tar.bz2
 - tar xvjf p7zip.tar.bz2 && cd p7zip_16.02
-- sudo ./install.sh
+- make && sudo make install
+- sudo cp -v ./bin/7za /usr/bin/7za
 - cd ..
 - git clone https://github.com/radare/radare2 && cd radare2
 - "./configure --prefix=`pwd`/install > /dev/null"
