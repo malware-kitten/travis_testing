@@ -1,6 +1,5 @@
 import sys
 import r2pipe
-import multiprocessing
 import argparse
 import subprocess
 import tempfile
@@ -17,6 +16,7 @@ def normalize_name(fname):
     #C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\lib\amd64\foo.lib
     file_path = Path(fname)
     arch = None
+    sorted_dict = {}
     basename = file_path.stem
     for elem in file_path.parts:
         if elem == "amd64" or elem == "arm":
@@ -27,7 +27,9 @@ def normalize_name(fname):
         filename = "VisualStudio%s_%s_%s.zig" % (vs_version, arch, basename)
     else:
         filename = "VisualStudio%s_x86_%s.zig" % (vs_version, basename)
-    return filename
+        arch = "x86"
+    version_and_arch = vs_version+"_"+arch
+    return filename, version_and_arch
 
 def mkdir_wrapper(path, is_dir=True):
     if not is_dir:
@@ -45,7 +47,7 @@ def mkdir_wrapper(path, is_dir=True):
         except Exception as e:
             raise
     return False
-     
+
 def recursive_all_files(directory, ext_filter=None):
     all_files = []
     dir_content = []
@@ -95,55 +97,71 @@ def dedup(zignatures):
             uniq_results.append(zig)
     return uniq_results
 
-def worker(queue, shared_results, lock):
-    while not queue.empty():
-        obj = queue.get(True)
-        logger.debug(" - %s" % obj)
-        json_items = generate_zigs_json(obj)
-        with lock:
-            for zigs in json_items:
-                shared_results.append(zigs)
-
-def process_single_file(fname, oname, num_threads):
+def process_single_file(fname):
     with open(fname,'rb') as fp:
         contents = fp.read(7)
     if contents == b'!<arch>':
+        shared_results = {}
         target_path = tempfile.mkdtemp()
-        command = ['7z', 'e', '-o'+target_path, fname,'-y']
+        command = ['7z', 'x', '-o'+target_path, fname,'-y']
         logger.debug("Building tmp location at %s" % target_path)
         logger.debug(command)
         output = subprocess.call(command)
         logger.debug(output)
-        queue = multiprocessing.Queue()
-        lock = multiprocessing.Lock()
-        manager = multiprocessing.Manager()
-        shared_results = manager.list()
+        shared_results = []
         for f in recursive_all_files(target_path, 'obj'):
-            queue.put(f)
-        logger.info("%s : %s" % (fname, queue.qsize()))
-        pool = multiprocessing.Pool(num_threads, worker, (queue, shared_results, lock))
-        pool.close()
-        pool.join()
+            json_items = generate_zigs_json(f)
+            for zigs in json_items:
+                shared_results.append(zigs)
     else:
         logger.error("File magic does not match, check to make sure this is a .lib file")
         return
     #cleanup
     shutil.rmtree(target_path)
-    uniq_results = dedup(shared_results)
-    if len(uniq_results) > 0:
+    return shared_results
+        #with open(oname, 'w') as fp:
+        #    fp.write(pformat(uniq_results))
+
+def process_directory(target_path, target_directory):
+    processed = []
+    sorted_dict = {}
+    mkdir_wrapper(target_directory)
+    for fname in recursive_all_files(target_path, 'lib'):
+        #normalize the output name, but return the version and arch for each obj
+        output_name, version_and_arch = normalize_name(fname)
+        if version_and_arch in sorted_dict:
+            sorted_dict[version_and_arch].append(fname)
+        else:
+            sorted_dict[version_and_arch] = []
+            sorted_dict[version_and_arch].append(fname)
+        #oname = str(Path(target_directory) / output_name)
+        print(sorted_dict)
+
+    for ver in sorted_dict:
+        results = []
+        logger.info("Processing %s" % ver)
+        for filename in sorted_dict[ver]:
+            for json_zig in process_single_file(filename):
+                results.append(json_zig)
+        uniq_results = dedup(results)
+        output_name = "VisualStudio%s_.zig" % ver
+        oname = str(Path(target_directory) / output_name)
         with open(oname, 'w') as fp:
             fp.write(pformat(uniq_results))
 
-def process_directory(target_path, target_directory, num_threads):
-    processed = []
+def process_zip(target_path, target_directory):
+    #output directory
     mkdir_wrapper(target_directory)
-    for fname in recursive_all_files(target_path, 'lib'):
-        output_name = normalize_name(fname)
-        oname = str(Path(target_directory) / output_name)
-        if oname in processed:
-            continue
-        else:
-            process_single_file(fname, oname, num_threads)
+    #temp directory for extraction
+    temp_path = tempfile.mkdtemp()
+    command = ['7z', 'x', '-o'+temp_path, target_path,'-y']
+    logger.debug("Building tmp location at %s" % target_path)
+    logger.info(command)
+    output = subprocess.call(command)
+    logger.debug(output)
+    process_directory(temp_path, target_directory)
+    #cleanup
+    shutil.rmtree(temp_path)
 
 def configure_logger(log_level):
     log_levels = {0: logging.ERROR, 1: logging.WARNING, 2: logging.INFO, 3: logging.DEBUG}
@@ -156,9 +174,9 @@ if __name__ == '__main__':
     group_toplevel = parser.add_mutually_exclusive_group(required=True)
     group_toplevel.add_argument("-f", "--file", help=".lib file to use")
     group_toplevel.add_argument("-d", "--dir", help="directory to scan for libs")
+    group_toplevel.add_argument("-z", "--zip", help="zip containing directory of lib files")
     parser.add_argument("-o", "--output",required=True,help="output filename or directory")
     parser.add_argument("-s", "--sdb", action='store_true', help="store as sdb files")
-    parser.add_argument("-t", "--threads", default=8, type=int, help="number of threads, default 8")
     parser.add_argument('-v', '--verbose', action='count', default=0, 
         help='Increase verbosity. Can specify multiple times for more verbose output')
     args = parser.parse_args()
@@ -167,6 +185,13 @@ if __name__ == '__main__':
     logger = logging.getLogger("MS_Zig_Parser")
 
     if args.file:
-        process_single_file(args.file, args.output, args.threads)
+        results = process_single_file(args.file)
+        uniq_results = dedup(results)
+        with open(args.output, 'w') as fp:
+            fp.write(pformat(uniq_results))
+
     if args.dir:
-        process_directory(args.dir, args.output, args.threads)
+        process_directory(args.dir, args.output)
+
+    if args.zip:
+        process_zip(args.zip, args.output)

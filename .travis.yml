@@ -4,8 +4,10 @@ language: python
 python:
   - "3.5"
 before_script:
-- wget "http://ftp.us.debian.org/debian/pool/main/p/p7zip/p7zip-full_16.02+dfsg-6_amd64.deb" -O 7z.deb
+- wget http://ftp.us.debian.org/debian/pool/main/p/p7zip/p7zip_16.02+dfsg-6_amd64.deb -O 7z.deb
+- wget http://ftp.us.debian.org/debian/pool/main/p/p7zip/p7zip-full_16.02+dfsg-6_amd64.deb -O 7z_full.deb
 - sudo dpkg -i 7z.deb
+- sudo dpkg -i 7z_full.deb
 - git clone https://github.com/radare/radare2 && cd radare2
 - "./configure --prefix=`pwd`/install > /dev/null"
 - make -s -j2 > /dev/null
