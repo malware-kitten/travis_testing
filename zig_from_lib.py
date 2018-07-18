@@ -103,7 +103,7 @@ def process_single_file(fname):
     if contents == b'!<arch>':
         shared_results = {}
         target_path = tempfile.mkdtemp()
-        command = ['7za', 'x', '-o'+target_path, fname,'-y']
+        command = ['7z', 'x', '-o'+target_path, fname,'-y']
         logger.debug("Building tmp location at %s" % target_path)
         logger.debug(command)
         output = subprocess.call(command)
