@@ -7,8 +7,7 @@ python:
 before_script:
 - wget "https://sourceforge.net/projects/p7zip/files/p7zip/16.02/p7zip_16.02_src_all.tar.bz2/download" -O p7zip.tar.bz2
 - tar xvjf p7zip.tar.bz2 && cd p7zip_16.02
-- make && sudo make install
-- sudo cp -v ./bin/7za /usr/bin/7za
+- make 7z && sudo make install
 - cd ..
 - git clone https://github.com/radare/radare2 && cd radare2
 - "./configure --prefix=`pwd`/install > /dev/null"
