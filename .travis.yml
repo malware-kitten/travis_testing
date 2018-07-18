@@ -8,6 +8,7 @@ before_script:
 - wget "https://sourceforge.net/projects/p7zip/files/p7zip/16.02/p7zip_16.02_x86_linux_bin.tar.bz2/download?use_mirror=iweb&r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fp7zip%2Ffiles%2Fp7zip%2F16.02%2F&use_mirror=iweb" -O p7zip.tar.bz2
 - tar xvjf p7zip.tar.bz2 && cd p7zip_16.02
 - sudo ./install.sh
+- cd ..
 - git clone https://github.com/radare/radare2 && cd radare2
 - "./configure --prefix=`pwd`/install > /dev/null"
 - make -s -j2 > /dev/null
@@ -24,4 +25,4 @@ before_script:
 
 script:
 - wget "https://github.com/dotnetinstaller/dotnetinstaller/blob/master/ThirdParty/Microsoft/Visual%20Studio%208/VC/lib/msvcrt.lib?raw=true" -O ./msvcrt.lib
-- python zig_from_lib.py -f ./msvcrt.lib -o ./msvcrt.zig -vvv 2>&1
+- python3 zig_from_lib.py -f ./msvcrt.lib -o ./msvcrt.zig -vvv 2>&1
