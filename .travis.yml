@@ -24,5 +24,5 @@ before_script:
 - pip install simplejson 
 
 script:
-- wget "https://github.com/dotnetinstaller/dotnetinstaller/blob/master/ThirdParty/Microsoft/Visual%20Studio%208/VC/lib/msvcrt.lib?raw=true" -O ./msvcrt.lib
-- python3 zig_from_lib.py -f ./msvcrt.lib -o ./msvcrt.zig -vvv 2>&1
+- wget "https://drive.google.com/file/d/1Q248oLTlKdAuiy9sPd3fQRJhIOxjLlwN/view?usp=sharing" -O ./zips.zip
+- python3 zig_from_lib.py -z ./zips.zip -o zigs/ -vvv 2>&1

@@ -81,6 +81,8 @@ def recursive_all_files(directory, ext_filter=None):
 
 def generate_zigs_json(f):
     r2p = r2pipe.open(f)
+    r2p.cmd('e zign.minsz=16')
+    r2p.cmd('e zign.mincc=10')
     r2p.cmd('aaa; zg')
     zigs = r2p.cmdj('zj')
     r2p.quit()
