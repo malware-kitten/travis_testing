@@ -24,5 +24,5 @@ before_script:
 - pip install simplejson 
 
 script:
-- wget "https://drive.google.com/file/d/1Q248oLTlKdAuiy9sPd3fQRJhIOxjLlwN/view?usp=sharing" -O ./zips.zip
+- wget "https://drive.google.com/uc?export=download&confirm=-AWa&id=1Q248oLTlKdAuiy9sPd3fQRJhIOxjLlwN" -O ./zips.zip
 - python3 zig_from_lib.py -z ./zips.zip -o zigs/ -vvv 2>&1
